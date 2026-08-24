@@ -8,6 +8,8 @@
 // tight for a desktop window shell. We set a realistic desktop surface
 // before pumping to avoid spurious layout/overflow failures.
 
+import 'dart:ui' show Size;
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:asur_find/main.dart';
