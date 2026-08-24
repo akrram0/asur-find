@@ -43,6 +43,11 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-infos
 
+      # 5b. Unit/widget tests — catches template regressions like the
+      #     MyApp incident before any compilation happens.
+      - name: Run tests
+        run: flutter test
+
       # 6. Release build of the native Windows executable
       - name: Build Windows release
         run: flutter build windows --release
