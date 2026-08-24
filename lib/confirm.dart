@@ -14,7 +14,7 @@ Future<bool> confirmAction(
   final res = await showMacosAlertDialog<bool>(
     context: context,
     builder: (context) => MacosAlertDialog(
-      appHeader: const MacosIcon(
+      appIcon: const MacosIcon(
         CupertinoIcons.exclamationmark_shield,
         size: 40,
       ),
