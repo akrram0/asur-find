@@ -1,0 +1,61 @@
+name: Windows Build
+
+# Triggers: every push to main touching app code, plus a manual button
+# ("Run workflow") in the GitHub Actions tab.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "pubspec.yaml"
+      - "analysis_options.yaml"
+      - ".github/workflows/windows_build.yml"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      # 1. Check out the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Install Flutter SDK (stable) into the ephemeral CI runner.
+      #    Nothing is ever installed on YOUR machine.
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # 3. Generate the Windows runner boilerplate.
+      #    This repo intentionally does NOT contain windows/ (zero local
+      #    SDK footprint), so CI creates it before building.
+      - name: Generate Windows runner
+        run: flutter create --platforms=windows --project-name asur_find .
+
+      # 4. Resolve dependencies exactly per pubspec.yaml
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Static analysis — fails the build on any error OR info-level
+      #    lint (strict mode). Remove --fatal-infos for warnings-only.
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      # 6. Release build of the native Windows executable
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      # 7. Package the runnable output (exe + DLLs + data/) as a ZIP
+      #    artifact downloadable from the run's summary page.
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asur-find-windows-release
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            build/windows/x64/runner/Release/*.exe
+            build/windows/x64/runner/Release/*.dll
+            build/windows/x64/runner/Release/data/**
