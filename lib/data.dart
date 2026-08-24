@@ -60,14 +60,14 @@ const List<CleanupItem> kCleanupItems = [
   ),
 ];
 
-// Swiss palette — solid fills, no gradients.
-const Color kOrange = Color(0xFFF79009); // needs review
-const Color kBlue = Color(0xFF1570EF); // actionable / accent
-const Color kGreen = Color(0xFF12B76A); // safe to clean
-const Color kGrayDark = Color(0xFF98A2B3);
-const Color kGrayMid = Color(0xFFD0D5DD);
-const Color kGrayLight = Color(0xFFEAECF0);
-const Color kInkSubtle = Color(0xFF344054);
+// macOS system palette — native accent & semantic colors (light mode).
+const Color kOrange = Color(0xFFFF9F0A); // systemOrange — needs review
+const Color kBlue = Color(0xFF007AFF); // systemBlue — accent / actions
+const Color kGreen = Color(0xFF34C759); // systemGreen — safe to clean
+const Color kGrayDark = Color(0xFFAEAEB2); // systemGray
+const Color kGrayMid = Color(0xFFD1D1D6); // systemGray3
+const Color kGrayLight = Color(0xFFE5E5EA); // systemGray5 — hairlines
+const Color kInkSubtle = Color(0xFF3A3A3C); // systemGray dark label
 
 // ---------------------------------------------------------------------------
 // Dev Clutter view

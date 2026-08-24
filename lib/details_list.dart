@@ -1,46 +1,75 @@
-// Cleanup candidates list: safety dot, name, Windows path, size,
-// native macOS PushButton per safety level.
+// Cleanup candidates list — REAL scanned data + safe confirmation flow.
 
 import 'package:flutter/cupertino.dart';
 import 'package:macos_ui/macos_ui.dart';
 
+import 'app_state.dart';
+import 'confirm.dart';
 import 'data.dart';
+import 'scanner.dart';
 
 class CleanupDetailsList extends StatelessWidget {
   const CleanupDetailsList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: kCleanupItems.map(_CleanupRow.new).toList(),
+    return ListenableBuilder(
+      listenable: appState,
+      builder: (context, _) {
+        if (appState.scanning) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                CupertinoActivityIndicator(),
+                SizedBox(width: 8),
+                Text('Scanning…'),
+              ],
+            ),
+          );
+        }
+        if (appState.cleanupItems.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text('Nothing to clean found.'),
+          );
+        }
+        return Column(
+          children: [
+            for (final item in appState.cleanupItems) _CleanupRow(item: item),
+          ],
+        );
+      },
     );
   }
 }
 
 class _CleanupRow extends StatelessWidget {
-  const _CleanupRow(this.item);
+  const _CleanupRow({required this.item});
 
   final CleanupItem item;
 
-  Color get _dotColor {
-    switch (item.safety) {
-      case SafetyLevel.safe:
-        return kGreen;
-      case SafetyLevel.review:
-        return kOrange;
-      case SafetyLevel.locked:
-        return kGrayMid;
-    }
-  }
+  Color get _dotColor => switch (item.safety) {
+        SafetyLevel.safe => kGreen,
+        SafetyLevel.review => kOrange,
+        SafetyLevel.locked => kGrayMid,
+      };
 
-  Color get _actionColor {
-    switch (item.safety) {
-      case SafetyLevel.safe:
-        return kGreen;
-      case SafetyLevel.review:
-        return kOrange;
-      case SafetyLevel.locked:
-        throw StateError('Locked items render no button');
+  Future<void> _onPressed(BuildContext context) async {
+    if (item.action == 'Clean') {
+      final confirmed = await confirmAction(
+        context,
+        title: 'Move to Recycle Bin?',
+        message:
+            '${item.name} (${item.size}) will be moved to the Recycle Bin. '
+            'You can restore it later.',
+        confirmLabel: 'Clean',
+        confirmColor: kGreen,
+      );
+      if (confirmed) await appState.clean(item);
+    } else if (item.action == 'Review') {
+      // Non-destructive: just reveal the folder in Explorer.
+      await StorageScanner.revealInExplorer(item.path);
     }
   }
 
@@ -57,7 +86,6 @@ class _CleanupRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Safety level dot
             Container(
               width: 8,
               height: 8,
@@ -67,8 +95,6 @@ class _CleanupRow extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-
-            // Name + strict Windows path
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -89,8 +115,6 @@ class _CleanupRow extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Size — tabular figures
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -101,8 +125,6 @@ class _CleanupRow extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Contextual action — native PushButton or disabled Protected state
             if (isLocked)
               Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -119,8 +141,8 @@ class _CleanupRow extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8),
                 child: PushButton(
                   controlSize: ControlSize.small,
-                  color: _actionColor,
-                  onPressed: () {}, // TODO: invoke backend clean/archive
+                  color: item.action == 'Clean' ? kGreen : kBlue,
+                  onPressed: () => _onPressed(context),
                   child: Text(
                     item.action!,
                     style: typography.caption1.copyWith(
@@ -135,3 +157,4 @@ class _CleanupRow extends StatelessWidget {
     );
   }
 }
+
