@@ -121,7 +121,7 @@ fn clean_paths(app: tauri::AppHandle, paths: Vec<String>) -> Result<Vec<IpcRecor
 
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_window_state::init())
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![scan_roots, clean_paths])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
