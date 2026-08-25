@@ -1,0 +1,51 @@
+name: Build Windows exe
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- JS deps (pnpm only, per PRD section 0) ---
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # --- Go sidecar engine ---
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src-go/go.mod
+      - name: Test + build Go engine
+        run: |
+          cd src-go
+          go test ./...
+          go build -o bin/asur-find-engine.exe .
+
+      # --- Rust/Tauri shell (GitHub runners have no Smart App Control) ---
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Build Tauri app
+        run: pnpm tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ""
+
+      # --- Publish artifacts ---
+      - name: Upload exe installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: asur-find-windows
+          path: |
+            src-tauri/target/release/asur-find.exe
+            src-tauri/target/release/bundle/nsis/*.exe

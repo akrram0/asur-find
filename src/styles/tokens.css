@@ -1,0 +1,49 @@
+/* PRD section 3 — design tokens, exact pixel-level values.
+   Light theme is default; `data-theme="dark"` on <html> switches. */
+
+:root {
+  --bg-window: #ffffff;
+  --bg-titlebar: #f5f5f7;
+  --bg-card: #f5f5f7;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --divider: #e5e5ea;
+  --accent: #007aff;
+  --safe: #34c759;
+  --review: #ff9f0a;
+  --locked: rgba(142, 142, 147, 0.5);
+  --shadow-window: 0px 8px 32px rgba(0, 0, 0, 0.18);
+
+  /* section 3.2 sidebar glass */
+  --sidebar-bg: rgba(245, 245, 247, 0.72);
+  --sidebar-blur: 40px;
+
+  font-family: Inter, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg-window: #1e1e1e;
+  --bg-titlebar: #2c2c2e;
+  --bg-card: #2c2c2e;
+  --text-primary: #f5f5f7;
+  --text-secondary: #98989d;
+  --divider: #38383a;
+  --accent: #0a84ff;
+  --safe: #30d158;
+  --review: #ff9f0a;
+  --locked: rgba(142, 142, 147, 0.5);
+  --shadow-window: 0px 8px 32px rgba(0, 0, 0, 0.4);
+  --sidebar-bg: rgba(0, 0, 0, 0.45);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-window);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}

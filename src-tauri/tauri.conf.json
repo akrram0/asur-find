@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Asur Find",
+  "version": "1.0.0",
+  "identifier": "com.asur.find",
+  "build": {
+    "beforeDevCommand": "pnpm vite:dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm vite:build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Asur Find",
+        "width": 1024,
+        "height": 768,
+        "minWidth": 1024,
+        "minHeight": 768,
+        "resizable": false,
+        "decorations": true,
+        "transparent": false,
+        "windowEffects": {
+          "effects": ["acrylic", "mica"],
+          "state": "active"
+        }
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/app.ico"]
+  }
+}

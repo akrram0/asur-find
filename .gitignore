@@ -1,0 +1,18 @@
+# Dependencies / build artifacts (PRD section 0 rule 4)
+node_modules/
+dist/
+target/
+.tooling/
+src-go/bin/
+
+# Tauri generated
+src-tauri/gen/
+
+# App user data
+app-data/
+
+# Env / IDE
+.env
+.vs/
+.idea/
+*.log

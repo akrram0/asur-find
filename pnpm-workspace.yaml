@@ -1,0 +1,6 @@
+packages:
+  # single-package workspace root (PRD section 2 structure)
+  - '.'
+
+allowBuilds:
+  esbuild: true
