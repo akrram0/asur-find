@@ -3,12 +3,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufReader, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use tauri::Manager;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct EngineRequest {
     cmd: String,
     id: i32,
@@ -18,7 +18,7 @@ struct EngineRequest {
     paths: Vec<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct IpcEntry {
     path: String,
     sizeBytes: i64,
@@ -29,7 +29,7 @@ struct IpcEntry {
     action: String,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct IpcRecord {
     timestamp: String,
     path: String,
@@ -54,7 +54,7 @@ struct EngineResponse {
 fn engine_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let candidates = [
         app.path().resource_dir().ok().map(|d| d.join("asur-find-engine.exe")),
-        std::env::current_exe().ok().map(|d| d.parent()?.parent()?.join("src-go/bin/asur-find-engine.exe")),
+        std::env::current_exe().ok().and_then(|d| Some(d.parent()?.parent()?.join("src-go/bin/asur-find-engine.exe"))),
         Some(PathBuf::from("../src-go/bin/asur-find-engine.exe")),
     ];
     for c in candidates.iter().flatten() {
